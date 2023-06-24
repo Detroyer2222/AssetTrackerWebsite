@@ -1,0 +1,43 @@
+﻿@using FluentValidation
+@using System.ComponentModel.DataAnnotations
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5">
+            Login
+        </MudText>
+    </TitleContent>
+
+    <DialogContent>
+        <MudForm Model="@LoginModel" @bind-IsValid="@FormValid">
+            <MudTextField Label="Email" 
+                          @bind-Value="@LoginModel.Email"
+                          Immediate="true"
+                          Required="true"
+                          RequiredError="EmailAddressAttribute is required"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+            <MudTextField Label="Password" 
+                          @bind-Value="@LoginModel.Password"
+                          Immediate="true" 
+                          Required="true"
+                          RequiredError="Paassword is required" 
+                          InputType="InputType.Password" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="ChangeRegister" Color="Color.Warning">Register</MudButton>
+        <MudButton OnClick="Login" Color="Color.Primary" Disabled="FormInvalid">
+            @if (FormInvalid)
+            {
+                <MudText>Form Invalid</MudText>
+            }
+            else
+            {
+                <MudText>Login</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+}

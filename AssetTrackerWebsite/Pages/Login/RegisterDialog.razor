@@ -1,0 +1,54 @@
+﻿@using System.ComponentModel.DataAnnotations
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5">
+            Register
+        </MudText>
+    </TitleContent>
+
+    <DialogContent>
+        <MudForm Model="@SignupModel" @bind-IsValid="@FormValid">
+            <MudTextField Label="User Name" 
+                          @bind-Value="@SignupModel.UserName"
+                          Immediate="true" 
+                          Required="true"
+                          RequiredError="User Name is required"/>
+            <MudTextField Label="Email"
+                          @bind-Value="@SignupModel.Email"
+                          InputType="InputType.Email"
+                          Immediate="true" 
+                          Required="true"
+                          RequiredError="Email is required"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is required"})"/>
+            <MudTextField Label="Password" 
+                          @bind-Value="@SignupModel.Password" 
+                          @ref="passwordField"
+                          InputType="InputType.Password"
+                          Immediate="true" 
+                          Required="true"
+                          RequiredError="Password is required" />
+            <MudTextField Label="Confirm Password"
+                          T="string"
+                          InputType="InputType.Password"
+                          HelperText="Confirm Password"
+                          Immediate="true" 
+                          Validation="@(new Func<string, string>(PasswordMatch))" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="ChangeLogin" Color="Color.Warning">Login</MudButton>
+        <MudButton OnClick="Register" Color="Color.Primary" Disabled="FormInvalid">
+            @if (FormInvalid)
+            {
+                <MudText>Form Invalid</MudText>
+            }
+            else
+            {
+                <MudText>Register</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+}

@@ -1,8 +1,13 @@
-﻿@inherits LayoutComponentBase
+﻿@using AssetTrackerWebsite.Pages.Login
+@inherits LayoutComponentBase
+@inject IDialogService DialogService
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkTheme" Theme="_theme" />
-<MudDialogProvider />
 <MudSnackbarProvider />
+<MudDialogProvider 
+    CloseOnEscapeKey="true"
+    CloseButton="true"
+    DisableBackdropClick="true" />
 
 <MudLayout>
     <MudAppBar Elevation="0">
@@ -16,8 +21,45 @@
         {
             <MudIconButton Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit" OnClick="@ToggleDarkMode" Title="Toggle Dark Theme" />
         }
+        <AuthorizeView>
+            <Authorized>
+                <MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                    <ActivatorContent>
+                        <MudAvatar Color="Color.Success" Variant="Variant.Filled">
+                            <MudIcon Icon="@Icons.Material.Filled.AccountCircle"/>
+                        </MudAvatar>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem OnClick="OnLogout" OnTouch="OnLogout">
+                            <MudIcon Icon="@Icons.Material.Filled.Logout" Size="Size.Medium" Color="Color.Tertiary" />
+                            Logout
+                        </MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+            </Authorized>
+
+            <NotAuthorized>
+                <MudMenu AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.BottomLeft">
+                    <ActivatorContent>
+                        <MudAvatar Color="Color.Error" Variant="Variant.Filled">
+                            <MudIcon Icon="@Icons.Material.Filled.AccountCircle"/>
+                        </MudAvatar>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem OnClick="OnLogin" OnTouch="OnLogin">
+                            <MudIcon Class="mt-n1 mx-2" Icon="@Icons.Material.Filled.Login" Size="Size.Medium" Color="Color.Secondary" />
+                            Login
+                        </MudMenuItem>
+                        <MudMenuItem OnClick="OnSignUp" OnTouch="OnSignUp"> 
+                            <MudIcon Class="mt-n2 mx-2" Icon="@Icons.Material.Filled.Login" Size="Size.Medium" Color="Color.Primary" />
+                            Sign up
+                        </MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">AssetTrackerWebsite</MudText>
         </MudDrawerHeader>
@@ -40,9 +82,43 @@
 
     private MudTheme _theme = new();
     private bool _isDarkTheme;
-    
+
     void ToggleDarkMode()
     {
         _isDarkTheme = !_isDarkTheme;
     }
+
+    // TODO: Create Dialogs for Login and Sign Up
+    private async Task OnLogin()
+    {
+        var dialog = DialogService.Show<LoginDialog>();
+        var result = await dialog.Result;
+
+        if (String.Equals(result.Data.ToString(), "Register"))
+        {
+            await OnSignUp();
+        }
+    }
+
+    private async Task OnSignUp()
+    {
+        var dialog = DialogService.Show<RegisterDialog>();
+        var result = await dialog.Result;
+
+        if (String.Equals(result.Data.ToString(), "Login"))
+        {
+            await OnLogin();
+        }
+    }
+
+    private Task OnLogout()
+    {
+        throw new NotImplementedException();
+    }
+
 }
+<style>
+    .blurryBackground {
+        backdrop-filter: blur(10px);
+    }
+</style>
