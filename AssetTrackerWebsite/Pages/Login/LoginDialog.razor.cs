@@ -26,7 +26,8 @@ public partial class LoginDialog : ComponentBase
     private async Task Login()
     {
         var loginResult = await Http.LoginUser(LoginModel);
-        if (!String.IsNullOrEmpty(loginResult.AccessToken))
+        // TODO: fix this shit
+        if (loginResult is not null)
         {
             Snackbar.Add("Login successful", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));

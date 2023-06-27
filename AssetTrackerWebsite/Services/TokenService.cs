@@ -1,44 +1,67 @@
 ﻿using AssetTrackerWebsite.Models.Authentication;
-using AssetTrackerWebsite.Models.Authentication.Login;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 
 namespace AssetTrackerWebsite.Services;
 
 public interface ITokenService
 {
-    Task<TokenStore> GetToken();
-    Task RemoveToken();
-    Task SetToken(UserLoginResultDto tokenDTO);
+    Task<AuthenticationDataStorage> GetJwtToken();
+    Task RemoveJwtToken();
+    Task SetJwtToken(string token, DateTime expiration);
+
+    Task<RefreshTokenStorage> GetRefreshToken();
+    Task RemoveRefreshToken();
+    Task SetRefreshToken(string token, DateTime expiration);
 }
 
 public class TokenService : ITokenService
 {
-    private readonly ILocalStorageService localStorageService;
+    private readonly ILocalStorageService _localStorageService;
+    private readonly ISessionStorageService _sessionStorageService;
 
-    public TokenService(ILocalStorageService localStorageService)
+    public TokenService(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService)
     {
-        this.localStorageService = localStorageService;
+        this._localStorageService = localStorageService;
+        _sessionStorageService = sessionStorageService;
     }
 
-    public async Task SetToken(UserLoginResultDto tokenDTO)
+    public async Task SetJwtToken(string token, DateTime expiration)
     {
         //TODO - Add expiration date to token
-        await localStorageService.SetItemAsync("token", new TokenStore
+        await _sessionStorageService.SetItemAsync("jwtToken", new AuthenticationDataStorage
         {
-            AccessToken = tokenDTO.AccessToken,
-            RefreshToken = tokenDTO.RefreshToken,
-            AccessTokenExpiration = DateTime.Now.AddMinutes(60),
-            //RefreshTokenExpiry = DateTime.Now.AddSeconds(tokenDTO.RefreshTokenExpiresIn)
+            AccessToken = token,
+            AccessTokenExpiration = expiration,
         });
     }
 
-    public async Task<TokenStore> GetToken()
+    public async Task<AuthenticationDataStorage> GetJwtToken()
     {
-        return await localStorageService.GetItemAsync<TokenStore>("token");
+        return await _sessionStorageService.GetItemAsync<AuthenticationDataStorage>("jwtToken");
     }
 
-    public async Task RemoveToken()
+    public async Task RemoveJwtToken()
     {
-        await localStorageService.RemoveItemAsync("token");
+        await _sessionStorageService.RemoveItemAsync("token");
+    }
+
+    public async Task SetRefreshToken(string token, DateTime expiration)
+    {
+        await _localStorageService.SetItemAsync("refreshToken", new RefreshTokenStorage
+        {
+            RefreshToken = token,
+            RefreshTokenExpiriation = expiration,
+        });
+    }
+
+    public async Task<RefreshTokenStorage> GetRefreshToken()
+    {
+        return await _localStorageService.GetItemAsync<RefreshTokenStorage>("refreshToken");
+    }
+
+    public async Task RemoveRefreshToken()
+    {
+        await _localStorageService.RemoveItemAsync("refreshToken");
     }
 }

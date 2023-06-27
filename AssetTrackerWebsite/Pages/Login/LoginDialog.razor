@@ -20,12 +20,17 @@
                           Immediate="true" 
                           Required="true"
                           RequiredError="Paassword is required" 
-                          InputType="InputType.Password" />
+                          InputType="InputType.Password" 
+                          @onkeydown="@(async (e) => { if (e.Key == "Enter") await Login(); })" />
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="ChangeRegister" Color="Color.Warning">Register</MudButton>
-        <MudButton OnClick="Login" Color="Color.Primary" Disabled="FormInvalid">
+        <MudButton OnClick="ChangeRegister" 
+                   Color="Color.Warning">Register</MudButton>
+        <MudButton OnClick="Login"
+                   
+                   Color="Color.Primary" 
+                   Disabled="FormInvalid">
             @if (FormInvalid)
             {
                 <MudText>Form Invalid</MudText>
